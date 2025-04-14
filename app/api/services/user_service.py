@@ -2,7 +2,6 @@
 from fastapi import HTTPException
 from ..repositories.user_repository import UserRepository
 from ..models.schemas import UserInDB, UserLogin
-
 class UserService:
     def __init__(self, db):
         self.repository = UserRepository(db)

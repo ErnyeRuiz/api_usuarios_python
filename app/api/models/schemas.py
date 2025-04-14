@@ -15,6 +15,7 @@ class UserInDB(BaseModel):
     telefono: str
     fechanacimiento: date
     fecharegistro: datetime
+    nombreusuario: str
     contrasena: str
     correo: str
 
