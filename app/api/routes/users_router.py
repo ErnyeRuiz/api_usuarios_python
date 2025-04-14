@@ -7,8 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
-@user_router.post(
+@user_router.api_route(
     "/login",
+    methods = ["POST", "OPTIONS"],
     response_model = UserInDB,
     summary = "Iniciar sesión",
     responses = {
@@ -29,15 +30,8 @@ async def login(
     try:
         service = UserService(db)
         user = await service.login(credentials)
-        if not user:
-            raise HTTPException(
-                status_code = status.HTTP_401_UNATHORIZED,
-                                detail="Credenciales incorrectas"
-            )
-        
         return user
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+    except HTTPException:
+        raise
+    except Exception:
+        raise
