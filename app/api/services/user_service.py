@@ -19,8 +19,7 @@ class UserService:
         except HTTPException:
             raise
         except Exception as e:
-            print(f"Error en UserService.login: {str(e)}")  # Usar logging en producción
             raise HTTPException(
                 status_code = 500,
-                detail = "Error interno del servidor al ejecutar el login"
+                detail = "Error interno: " + e
             )
