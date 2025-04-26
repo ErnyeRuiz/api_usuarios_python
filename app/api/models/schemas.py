@@ -21,3 +21,13 @@ class UserInDB(BaseModel):
 
     class Config:
         orm_mode = True
+
+class User(BaseModel):
+    usuarioID: int
+    nombre: str
+    apellidos: str
+    cedula: str
+    telefono: str
+    fechaNacimiento: date
+    fechaRegistro: datetime
+    nombreUsuario: str

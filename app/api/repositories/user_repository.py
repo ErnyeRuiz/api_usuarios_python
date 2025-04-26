@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.schemas import UserInDB, UserLogin
+from ..models.schemas import User, UserInDB, UserLogin
 
 class UserRepository:
     def __init__(self, db: AsyncSession):
@@ -34,3 +34,6 @@ class UserRepository:
                 status_code = 400,
                 detail = f'Error en el login: {str(e)}'
             )    
+        
+    async def createUser(user: User) -> int:
+        return 1
