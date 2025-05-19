@@ -1,5 +1,6 @@
 from datetime import date, datetime
-from pydantic import BaseModel, EmailStr
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 class UserLogin(BaseModel):
     """Esquema para login"""
@@ -15,8 +16,18 @@ class UserInDB(BaseModel):
     telefono: str
     fechanacimiento: date
     fecharegistro: datetime
+    nombreusuario: str
     contrasena: str
     correo: str
 
     class Config:
-        orm_mode = True
+        model_config = ConfigDict(from_attributes=True)
+class User(BaseModel):
+    usuarioID: Optional[int] = None
+    nombre: str
+    apellidos: str
+    cedula: str
+    fechaNacimiento: date
+    fechaRegistro: Optional[datetime] = None
+    nombreUsuario: str
+    contrasena: Optional[str] = ''

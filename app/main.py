@@ -1,10 +1,12 @@
 from fastapi import FastAPI
+
+from app.api.routes.auth_router import auth_router
 from .api.core.config import settings
 from .api.routes.users_router import user_router
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(
     title=settings.APP_NAME,
-    description="API para gestión de usuarios con PostgreSQL",
+    description="API usuarios",
     version="1.0.0"
 )
 
@@ -18,6 +20,7 @@ app.add_middleware(
 
 # Incluye las rutas
 app.include_router(user_router)
+app.include_router(auth_router)
 
 @app.get("/")
 async def root():
