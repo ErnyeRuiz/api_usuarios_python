@@ -1,39 +1,48 @@
+import re
 from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.models.generic.http_response import ApiResponse, error_response, success_response
 from ..models.schemas import User, UserInDB, UserLogin
 
 class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
-
-    async def login(self, user: UserLogin) -> Optional[UserInDB]:
-        """
-        Ejecuta una funcion para hacer login
-        """
-        query = text(
-            "SELECT * FROM login(:username, :password)"
-        )
-        params = {
-            "username": user.username,
-            "password": user.password,
-            "": None  # Parámetro de salida va a ser null o un usuario (model usuario)
-        }
-
+        
+    async def createUser(self, user: User) -> ApiResponse[int]:
         try:
-            result = await self.db.execute(query, params)
-            user_data = result.mappings().first()
+            query = text(
+                "CALL InsertUser(:_nombre, :_apellidos, :_cedula, :_fechaNacimiento, :_nombreUsuario, :_contrasena)"
+                )
+            result = await self.db.execute(query, {
+                "_nombre": user.nombre, 
+                "_apellidos": user.apellidos, 
+                "_cedula": user.cedula, 
+                "_fechaNacimiento": user.fechaNacimiento, 
+                "_nombreUsuario": user.nombreUsuario, 
+                "_contrasena": user.contrasena
+            })
 
-            if user_data:
-                return UserInDB(**user_data)
-            return None
+            usuario_id = result.scalar_one()
+            await self.db.commit()
+            return success_response(data=usuario_id, message="Usuario creado")
+        
         except Exception as e:
             await self.db.rollback()
             raise HTTPException(
-                status_code = 400,
-                detail = f'Error en el login: {str(e)}'
-            )    
-        
-    async def createUser(user: User) -> int:
-        return 1
+                status_code=400,
+                detail=error_response(
+                    message="Error en base de datos",
+                    error_details=extraer_error_personalizado(e)
+                ).model_dump()
+            )
+    
+def extraer_error_personalizado(error: Exception) -> str:
+    mensaje = str(error)
+    # Busca el mensaje entre los delimitadores #
+    coincidencia = re.search(r"#(.*?)#", mensaje)
+    if coincidencia:
+        return coincidencia.group(1).strip()
+    return "Error interno del servidor"
